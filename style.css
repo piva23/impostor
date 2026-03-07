@@ -1,0 +1,221 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Orbitron, Arial;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  height: 100vh;
+  background: black;
+  color: white;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  touch-action: manipulation;
+}
+
+/* estrelas */
+
+.stars,
+.stars2,
+.stars3 {
+  position: fixed;
+  top: -1000px;
+  left: -1000px;
+
+  width: 4000px;
+  height: 4000px;
+
+  background-repeat: repeat;
+
+  z-index: 0;
+}
+
+.stars {
+  background-image: radial-gradient(white 1px, transparent 1px);
+  background-size: 40px 40px;
+
+  animation: moveStars 60s linear infinite;
+
+  opacity: 0.6;
+}
+
+.stars2 {
+  background-image: radial-gradient(white 1px, transparent 1px);
+  background-size: 80px 80px;
+
+  animation: moveStars 120s linear infinite;
+
+  opacity: 0.35;
+}
+
+.stars3 {
+  background-image: radial-gradient(white 2px, transparent 2px);
+  background-size: 120px 120px;
+
+  animation: moveStars 200s linear infinite;
+
+  opacity: 0.25;
+}
+
+@keyframes moveStars {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-2000px);
+  }
+}
+
+/* app */
+
+.app {
+  text-align: center;
+  z-index: 2;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 40px;
+
+  color: #c04cff;
+
+  text-shadow:
+    0 0 15px #c04cff,
+    0 0 35px #c04cff;
+
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  opacity: 0.7;
+  margin-bottom: 30px;
+}
+
+/* área da carta */
+
+.cardArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* carta */
+
+.card {
+  width: 220px;
+  height: 260px;
+
+  perspective: 1000px;
+
+  cursor: pointer;
+}
+
+.cardInner {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+
+  transform-style: preserve-3d;
+
+  transition: transform 0.6s;
+}
+
+.card.flip .cardInner {
+  transform: rotateY(180deg);
+}
+
+.cardFront,
+.cardBack {
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+
+  backface-visibility: hidden;
+
+  border-radius: 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #0b0b0b;
+
+  border: 3px solid #b026ff;
+
+  box-shadow:
+    0 0 25px #b026ff,
+    inset 0 0 10px rgba(255, 0, 255, 0.3);
+}
+
+.cardBack {
+  transform: rotateY(180deg);
+}
+
+/* conteúdo */
+
+.roleIcon {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+.timer {
+  margin-top: 10px;
+  opacity: 0.7;
+  font-size: 18px;
+}
+
+/* astronauta */
+
+.astronaut svg {
+  width: 90px;
+  fill: #ff3bff;
+
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+/* responsivo */
+
+@media (max-width: 500px) {
+  h1 {
+    font-size: 30px;
+  }
+
+  .card {
+    width: 200px;
+    height: 240px;
+  }
+
+  .roleIcon {
+    font-size: 50px;
+  }
+
+  .timer {
+    font-size: 16px;
+  }
+}
