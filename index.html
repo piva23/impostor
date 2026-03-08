@@ -2,48 +2,131 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>Impostor Sorteio</title>
+    <title>Impostor Game</title>
 
     <link rel="stylesheet" href="style.css" />
 
-    <!-- PWA -->
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#000000" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
     <link rel="apple-touch-icon" href="icon-192.png" />
   </head>
 
   <body>
+    <!-- FUNDO ESPACIAL -->
+
     <div class="stars"></div>
     <div class="stars2"></div>
     <div class="stars3"></div>
+    <div class="nebula"></div>
 
-    <div class="app">
-      <h1>IMPOSTOR GAME</h1>
-      <p class="subtitle">Toque na tela</p>
+    <!-- INTRO -->
+
+    <div id="intro" class="screen intro">
+      <img src="logo.png" class="logo" />
+
+      <h1 class="gameTitle">Impostor Game</h1>
+
+      <button class="startBtn" onclick="openModes()">START</button>
+    </div>
+
+    <!-- ESCOLHA DE MODOS -->
+
+    <div id="modeScreen" class="screen hidden">
+      <h1 class="title">Escolha o modo</h1>
+
+      <div class="modeContainer">
+        <!-- CARD NORMAL -->
+
+        <div class="modeCard" onclick="setMode('normal')">
+          <h2>Modo Normal</h2>
+
+          <p>
+            Modo clássico do jogo.<br />
+            Os papéis são distribuídos normalmente.
+          </p>
+        </div>
+
+        <!-- CARD XERIFE -->
+
+        <div class="modeCard" onclick="setMode('xerife')">
+          <h2>Xerifes vs Falsos Xerifes</h2>
+
+          <p>
+            Existe apenas <b>1 Falso Xerife</b>.<br />
+            Todos os outros são Xerifes.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENU JOGADORES -->
+
+    <div id="menu" class="screen hidden">
+      <h1 class="title">Quantos jogadores?</h1>
+
+      <input id="playerCount" type="number" min="2" max="12" value="3" />
+
+      <p id="playerWarning" class="warning"></p>
+
+      <button id="startBtn">Continuar</button>
+    </div>
+
+    <!-- TELA COMEÇAR -->
+
+    <div id="startGameScreen" class="screen hidden">
+      <h1>Preparados?</h1>
+
+      <p>Passe o celular para o <b>Player 1</b></p>
+
+      <button onclick="beginGame()">Começar</button>
+    </div>
+
+    <!-- GAME -->
+
+    <div id="gameScreen" class="screen hidden">
+      <h2 id="playerText"></h2>
 
       <div class="cardArea">
-        <div id="card" class="card hidden">
+        <div id="card" class="card">
           <div class="cardInner">
+            <!-- FRENTE -->
+
             <div class="cardFront">
               <div class="astronaut">
                 <svg viewBox="0 0 120 120">
-                  <ellipse cx="60" cy="70" rx="35" ry="40" />
-                  <rect x="30" y="35" width="60" height="40" rx="20" />
-                  <ellipse cx="60" cy="50" rx="20" ry="15" fill="#aeefff" />
+                  <ellipse cx="60" cy="70" rx="35" ry="40"></ellipse>
+
+                  <rect x="30" y="35" width="60" height="40" rx="20"></rect>
+
+                  <ellipse
+                    cx="60"
+                    cy="50"
+                    rx="20"
+                    ry="15"
+                    fill="#aeefff"
+                  ></ellipse>
                 </svg>
               </div>
 
               <p>Toque para revelar</p>
             </div>
 
+            <!-- VERSO -->
+
             <div class="cardBack">
               <div id="roleIcon" class="roleIcon"></div>
+
               <h2 id="roleName"></h2>
 
               <p class="timer">
                 Memorize<br />
+
                 <span id="count">3</span>s
               </p>
             </div>
@@ -52,12 +135,22 @@
       </div>
     </div>
 
-    <!-- música do jogo -->
+    <!-- FINAL -->
+
+    <div id="finalScreen" class="screen hidden">
+      <h1>Todos receberam papéis</h1>
+
+      <p>Agora comecem o jogo!</p>
+
+      <button onclick="restartGame()">Novo jogo</button>
+    </div>
+
+    <!-- ÁUDIOS -->
+
     <audio id="music" loop>
       <source src="music.mp3" type="audio/mpeg" />
     </audio>
 
-    <!-- efeitos -->
     <audio id="flip">
       <source
         src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
@@ -70,85 +163,6 @@
       />
     </audio>
 
-    <script>
-      const roles = [
-        { name: 'Impostor', icon: '🔪', color: '#ff1744' },
-        { name: 'Inocente', icon: '🙂', color: '#00e676' },
-        { name: 'Xerife', icon: '⭐', color: '#ffd600' },
-        { name: 'Herói', icon: '🛡️', color: '#00e5ff' },
-        { name: 'Palhaço', icon: '🤡', color: '#ff4081' },
-        { name: 'Rastreador', icon: '🧭', color: '#ff9100' },
-        { name: 'Falso Xerife', icon: '🎖️', color: '#ff5252' },
-        { name: 'Médico', icon: '💉', color: '#40c4ff' },
-        { name: 'Reportador', icon: '📢', color: '#b388ff' },
-      ];
-
-      let currentRole = null;
-      let revealed = false;
-
-      const card = document.getElementById('card');
-      const roleIcon = document.getElementById('roleIcon');
-      const roleName = document.getElementById('roleName');
-
-      const flipSound = document.getElementById('flip');
-      const endSound = document.getElementById('endSound');
-      const music = document.getElementById('music');
-
-      function handleTouch() {
-        music.play().catch(() => {});
-
-        if (card.classList.contains('hidden')) {
-          const random = Math.floor(Math.random() * roles.length);
-          currentRole = roles[random];
-
-          card.classList.remove('hidden');
-          revealed = false;
-
-          return;
-        }
-
-        if (!revealed) {
-          flipSound.play();
-
-          card.classList.add('flip');
-
-          roleIcon.innerText = currentRole.icon;
-          roleName.innerText = currentRole.name;
-
-          roleName.style.color = currentRole.color;
-          card.style.borderColor = currentRole.color;
-
-          revealed = true;
-
-          let time = 3;
-          document.getElementById('count').innerText = time;
-
-          const timer = setInterval(() => {
-            time--;
-            document.getElementById('count').innerText = time;
-
-            if (time <= 0) {
-              clearInterval(timer);
-
-              endSound.play();
-
-              card.classList.remove('flip');
-              card.classList.add('hidden');
-            }
-          }, 1000);
-        }
-      }
-
-      document.body.addEventListener('click', handleTouch);
-      document.body.addEventListener('touchstart', handleTouch);
-
-      /* REGISTRO DO SERVICE WORKER (PWA) */
-
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('service-worker.js');
-        });
-      }
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>
